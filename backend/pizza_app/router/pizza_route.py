@@ -33,11 +33,27 @@ async def get_designer_pizzas(db: Session = Depends(get_db)):
     pizzas = db.query(PizzaModel).all()
     return pizzas
 
+@router.get("/get_designer_pizza/{pizza_id}", response_model=Pizza)
+async def get_designer_pizza(pizza_id: int, db: Session = Depends(get_db)):
+    """Get a specific designer pizza by ID"""
+    pizza = db.query(PizzaModel).filter(PizzaModel.id == pizza_id).first()
+    if not pizza:
+        raise HTTPException(status_code=404, detail="Pizza not found")
+    return pizza
+
 @router.get("/get_pizza_sizes", response_model=List[Size])
 async def get_pizza_sizes(db: Session = Depends(get_db)):
     """Get all pizza sizes"""
     sizes = db.query(SizeModel).all()
     return sizes
+
+@router.get("/get_pizza_size/{size_id}", response_model=Size)
+async def get_pizza_size(size_id: int, db: Session = Depends(get_db)):
+    """Get a specific pizza size by ID"""
+    size = db.query(SizeModel).filter(SizeModel.id == size_id).first()
+    if not size:
+        raise HTTPException(status_code=404, detail="Size not found")
+    return size
 
 @router.get("/get_pizza_sauces", response_model=List[Sauce])
 async def get_pizza_sauces(db: Session = Depends(get_db)):
@@ -45,11 +61,27 @@ async def get_pizza_sauces(db: Session = Depends(get_db)):
     sauces = db.query(SauceModel).all()
     return sauces
 
+@router.get("/get_pizza_sauce/{sauce_id}", response_model=Sauce)
+async def get_pizza_sauce(sauce_id: int, db: Session = Depends(get_db)):
+    """Get a specific pizza sauce by ID"""
+    sauce = db.query(SauceModel).filter(SauceModel.id == sauce_id).first()
+    if not sauce:
+        raise HTTPException(status_code=404, detail="Sauce not found")
+    return sauce
+
 @router.get("/get_pizza_crusts", response_model=List[Crust])
 async def get_pizza_crusts(db: Session = Depends(get_db)):
     """Get all pizza crusts"""
     crusts = db.query(CrustModel).all()
     return crusts
+
+@router.get("/get_pizza_crust/{crust_id}", response_model=Crust)
+async def get_pizza_crust(crust_id: int, db: Session = Depends(get_db)):
+    """Get a specific pizza crust by ID"""
+    crust = db.query(CrustModel).filter(CrustModel.id == crust_id).first()
+    if not crust:
+        raise HTTPException(status_code=404, detail="Crust not found")
+    return crust
 
 @router.get("/get_pizza_toppings", response_model=List[Topping])
 async def get_pizza_toppings(db: Session = Depends(get_db)):
@@ -57,11 +89,27 @@ async def get_pizza_toppings(db: Session = Depends(get_db)):
     toppings = db.query(ToppingModel).all()
     return toppings
 
+@router.get("/get_pizza_topping/{topping_id}", response_model=Topping)
+async def get_pizza_topping(topping_id: int, db: Session = Depends(get_db)):
+    """Get a specific pizza topping by ID"""
+    topping = db.query(ToppingModel).filter(ToppingModel.id == topping_id).first()
+    if not topping:
+        raise HTTPException(status_code=404, detail="Topping not found")
+    return topping
+
 @router.get("/get_pizza_topping_categories", response_model=List[ToppingCategory])
 async def get_pizza_topping_categories(db: Session = Depends(get_db)):
     """Get all topping categories"""
     categories = db.query(ToppingCategoryModel).all()
     return categories
+
+@router.get("/get_pizza_topping_category/{category_id}", response_model=ToppingCategory)
+async def get_pizza_topping_category(category_id: int, db: Session = Depends(get_db)):
+    """Get a specific pizza topping category by ID"""
+    category = db.query(ToppingCategoryModel).filter(ToppingCategoryModel.id == category_id).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Topping category not found")
+    return category
 
 @router.get("/{pizza_id}", response_model=Pizza)
 async def get_pizza(pizza_id: int, db: Session = Depends(get_db)):

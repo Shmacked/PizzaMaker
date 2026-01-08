@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 import logging
 from pizza_app.router import pizza_route
 from pizza_app.models.pizza_models import init_db
+from fastapi.staticfiles import StaticFiles
 
 # Configure logging
 logging.basicConfig(
@@ -43,6 +44,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 app.include_router(pizza_route.router)
+app.mount("/", StaticFiles(directory="../frontend/dist", html=True))
 
 # List the URLs where your React app is running
 origins = [
@@ -54,8 +56,8 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
-    allow_credentials=False,  # Must be False when using wildcard origins
+    allow_origins=["http://localhost:5173"],  # Allow all origins for development
+    allow_credentials=True,  # Must be False when using wildcard origins
     allow_methods=["*"],
     allow_headers=["*"],
 )
