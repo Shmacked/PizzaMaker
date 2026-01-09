@@ -1,8 +1,16 @@
 import { Link } from "react-router-dom";
+import { Dropdown } from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import React from "react";
+import { useEffect } from "react";
 
 function PizzaNav() {
+    useEffect(() => {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            new Dropdown(dropdown as any);
+        });
+    }, []);
+
     return (
         <>
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -18,35 +26,19 @@ function PizzaNav() {
                         <li className="nav-item">
                             <Link to="/" className="nav-link">Menu</Link>
                         </li>
-                    </ul>
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link to="/sizes" className="nav-link">Sizes Manager</Link>
-                        </li>
-                    </ul>
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link to="/sauces" className="nav-link">Sauces Manager</Link>
-                        </li>
-                    </ul>
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link to="/crusts" className="nav-link">Crusts Manager</Link>
-                        </li>
-                    </ul>
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link to="/toppings" className="nav-link">Toppings Manager</Link>
-                        </li>
-                    </ul>
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link to="/topping_categories" className="nav-link">Topping Categories Manager</Link>
-                        </li>
-                    </ul>
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link to="/pizza_builder" className="nav-link">Pizza Manager</Link>
+
+                        <li className="nav-item dropdown">
+                            <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Managers
+                            </a>
+                            <ul className="dropdown-menu">
+                                <li><Link to="/sizes" className="dropdown-item">Sizes Manager</Link></li>
+                                <li><Link to="/sauces" className="dropdown-item">Sauces Manager</Link></li>
+                                <li><Link to="/crusts" className="dropdown-item">Crusts Manager</Link></li>
+                                <li><Link to="/toppings" className="dropdown-item">Toppings Manager</Link></li>
+                                <li><Link to="/topping_categories" className="dropdown-item">Topping Categories Manager</Link></li>
+                                <li><Link to="/pizza_builder" className="dropdown-item">Pizza Builder</Link></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
