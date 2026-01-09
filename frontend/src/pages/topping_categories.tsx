@@ -87,11 +87,11 @@ function ToppingCategories() {
             <div>
                 <PizzaNav />
             </div>
-            <div className="container mt-4">
+            <div className="container my-4">
                 <h1 className="mb-4">Topping Categories Manager</h1>
 
                 {/* Create/Edit Form */}
-                <div className="card mb-4">
+                <div className="card my-4">
                     <div className="card-header">
                         <h5 className="mb-0">{editingToppingCategory ? "Edit Topping Category" : "Add New Topping Category"}</h5>
                     </div>
@@ -148,7 +148,7 @@ function ToppingCategories() {
                 </div>
 
                 {/* Topping Categories List */}
-                <div className="card">
+                <div className="card my-4">
                     <div className="card-header">
                         <h5 className="mb-0">All Topping Categories</h5>
                     </div>

@@ -673,7 +673,8 @@ async def upload_image(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
         
         # Return the relative path that will be used in the frontend
-        return JSONResponse(content={"filename": f"images/{unique_filename}", "path": f"/images/{unique_filename}"})
+        # filename includes "dist" for database storage, path is the URL path
+        return JSONResponse(content={"filename": f"dist/images/{unique_filename}", "path": f"/images/{unique_filename}"})
     except Exception as e:
         logger.error(f"Error uploading file: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
@@ -682,11 +683,15 @@ async def upload_image(file: UploadFile = File(...)):
 async def delete_image(filename: str):
     """Delete an image file from the images directory"""
     try:
-        # Remove 'images/' prefix if present
-        if filename.startswith("images/"):
-            filename = filename[7:]
+        # Remove various path prefixes if present
+        if filename.startswith("dist/images/"):
+            filename = filename[13:]  # Remove "dist/images/"
+        elif filename.startswith("/dist/images/"):
+            filename = filename[14:]  # Remove "/dist/images/"
+        elif filename.startswith("images/"):
+            filename = filename[7:]  # Remove "images/"
         elif filename.startswith("/images/"):
-            filename = filename[8:]
+            filename = filename[8:]  # Remove "/images/"
         
         file_path = IMAGES_DIR / filename
         
@@ -717,10 +722,14 @@ async def delete_pizza(pizza_id: int, db: Session = Depends(get_db)):
         try:
             # Extract filename from image_url
             filename = pizza.image_url
-            if filename.startswith("images/"):
-                filename = filename[7:]
+            if filename.startswith("dist/images/"):
+                filename = filename[13:]  # Remove "dist/images/"
+            elif filename.startswith("/dist/images/"):
+                filename = filename[14:]  # Remove "/dist/images/"
+            elif filename.startswith("images/"):
+                filename = filename[7:]  # Remove "images/"
             elif filename.startswith("/images/"):
-                filename = filename[8:]
+                filename = filename[8:]  # Remove "/images/"
             
             file_path = IMAGES_DIR / filename
             if file_path.exists() and file_path.is_file():

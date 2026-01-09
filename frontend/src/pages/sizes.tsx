@@ -69,7 +69,6 @@ function Sizes() {
         }
 
         try {
-            console.log("Deleting size:", id);
             await deleteSize(id);
             loadSizes();
         } catch (error) {
@@ -88,11 +87,11 @@ function Sizes() {
             <div>
                 <PizzaNav />
             </div>
-            <div className="container mt-4">
+            <div className="container my-4">
                 <h1 className="mb-4">Sizes Manager</h1>
 
                 {/* Create/Edit Form */}
-                <div className="card mb-4">
+                <div className="card my-4">
                     <div className="card-header">
                         <h5 className="mb-0">{editingSize ? "Edit Size" : "Add New Size"}</h5>
                     </div>
@@ -151,7 +150,7 @@ function Sizes() {
                 </div>
 
                 {/* Sizes List */}
-                <div className="card">
+                <div className="card my-4">
                     <div className="card-header">
                         <h5 className="mb-0">All Sizes</h5>
                     </div>

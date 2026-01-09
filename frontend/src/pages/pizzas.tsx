@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { getPizzas, addPizza, updatePizza, deletePizza, type Pizza, type PizzaCreatePayload, type PizzaUpdatePayload } from "../api/pizza.tsx";
-import { uploadImage, deleteImage } from "../api/images.ts";
+import { uploadImage, deleteImage, getImageUrl } from "../api/images.ts";
 import { getSizes, type Size } from "../api/sizes.tsx";
 import { getSauces, type Sauce } from "../api/sauces.tsx";
 import { getCrusts, type Crust } from "../api/crusts.tsx";
@@ -78,7 +78,7 @@ function Pizzas() {
             // Upload new file if one was selected
             if (imageFile) {
                 const uploadResult = await uploadImage(imageFile);
-                imageUrl = uploadResult.path; // Use the path returned from the server
+                imageUrl = uploadResult.filename; // Use the filename (includes "dist") for database storage
                 
                 // Delete old image if updating and old image exists
                 if (editingPizza && oldImageUrl) {
@@ -164,7 +164,6 @@ function Pizzas() {
         }
 
         try {
-            console.log("Deleting pizza:", id);
             await deletePizza(id);
             loadPizzas();
         } catch (error) {
@@ -252,7 +251,7 @@ function Pizzas() {
                                             <img className="img-fluid" style={{ width: "100px", height: "100px", objectFit: "cover" }} src={URL.createObjectURL(imageFile)} alt={formData.name || "Preview"} />
                                         )}
                                         {!imageFile && formData.image_url && (
-                                            <img className="img-fluid" style={{ width: "100px", height: "100px", objectFit: "cover" }} src={formData.image_url} alt={formData.name || "Pizza"} />
+                                            <img className="img-fluid" style={{ width: "100px", height: "100px", objectFit: "cover" }} src={getImageUrl(formData.image_url)} alt={formData.name || "Pizza"} />
                                         )}
                                     </div>
                                 </div>
@@ -431,7 +430,7 @@ function Pizzas() {
                                                 <td>{pizza.id}</td>
                                                 <td>{pizza.name}</td>
                                                 <td>{pizza.description}</td>
-                                                <td><img style={{ width: "100px", height: "100px", objectFit: "cover" }} src={pizza.image_url || "https://via.placeholder.com/150"} alt={pizza.name} /></td>
+                                                <td><img style={{ width: "100px", height: "100px", objectFit: "cover" }} src={getImageUrl(pizza.image_url)} alt={pizza.name} /></td>
                                                 <td className="text-center align-middle">
                                                     {pizza.is_available ? (
                                                         <i className="bi bi-check-circle-fill text-success" style={{ fontSize: "1.2rem" }}></i>

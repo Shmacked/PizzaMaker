@@ -73,6 +73,8 @@ interface DisplayPizzasProps {
     pizzas: Pizza[];
 }
 
+import { getImageUrl } from "./images";
+
 export const DisplayPizzas: React.FC<DisplayPizzasProps> = ({ pizzas }) => {
     return (
         <>
@@ -80,7 +82,7 @@ export const DisplayPizzas: React.FC<DisplayPizzasProps> = ({ pizzas }) => {
                 {pizzas.filter(p => p.is_available).map(p => (
                     <div className="col" key={p.id}>
                         <div className="card h-100" style={{ width: "18rem" }} key={p.id}>
-                            <img src={p.image_url} alt={p.name} className="card-img-top" style={{ height: "200px", objectFit: "cover" }} />
+                            <img src={getImageUrl(p.image_url)} alt={p.name} className="card-img-top" style={{ height: "200px", objectFit: "cover" }} />
                             <div className="card-body d-flex flex-column">
                                 <h5 className="card-title">{p.name}</h5>
                                 <p className="card-text">

@@ -44,6 +44,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 app.include_router(pizza_route.router)
+# Mount dist directory at /dist so images are accessible at /dist/images/
+# This also serves the React app at /dist/
+# app.mount("/dist", StaticFiles(directory="../frontend/dist", html=True))
+# Mount root to redirect or serve index from dist
 app.mount("/", StaticFiles(directory="../frontend/dist", html=True))
 
 # List the URLs where your React app is running

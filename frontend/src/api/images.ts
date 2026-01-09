@@ -33,3 +33,23 @@ export const deleteImage = async (filename: string): Promise<void> => {
         method: "DELETE",
     });
 };
+
+/**
+ * Convert database image path to URL path for display
+ * Handles conversion from "dist/images/..." to "/dist/images/..." for URL access
+ * @param imageUrl The image URL from the database (may include "dist" prefix)
+ * @returns The URL path suitable for use in img src attributes
+ */
+export const getImageUrl = (imageUrl: string | undefined | null): string => {
+    if (!imageUrl) return "https://via.placeholder.com/150";
+    // Convert "dist/images/..." to "/dist/images/..." for URL access
+    if (imageUrl.startsWith("dist/images/")) {
+        return `/${imageUrl}`;
+    }
+    // If it already starts with "/", return as is
+    if (imageUrl.startsWith("/")) {
+        return imageUrl;
+    }
+    // Otherwise, assume it's a relative path and add "/"
+    return `/${imageUrl}`;
+};

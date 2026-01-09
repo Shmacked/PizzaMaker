@@ -69,7 +69,6 @@ function Sauces() {
         }
 
         try {
-            console.log("Deleting sauce:", id);
             await deleteSauce(id);
             loadSauces();
         } catch (error) {
@@ -88,11 +87,11 @@ function Sauces() {
             <div>
                 <PizzaNav />
             </div>
-            <div className="container mt-4">
+            <div className="container my-4">
                 <h1 className="mb-4">Sauces Manager</h1>
 
                 {/* Create/Edit Form */}
-                <div className="card mb-4">
+                <div className="card my-4">
                     <div className="card-header">
                         <h5 className="mb-0">{editingSauce ? "Edit Sauce" : "Add New Sauce"}</h5>
                     </div>
@@ -151,7 +150,7 @@ function Sauces() {
                 </div>
 
                 {/* Sauces List */}
-                <div className="card">
+                <div className="card my-4">
                     <div className="card-header">
                         <h5 className="mb-0">All Sauces</h5>
                     </div>

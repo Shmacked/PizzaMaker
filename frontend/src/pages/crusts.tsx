@@ -69,7 +69,6 @@ function Crusts() {
         }
 
         try {
-            console.log("Deleting crust:", id);
             await deleteCrust(id);
             loadCrusts();
         } catch (error) {
@@ -88,11 +87,11 @@ function Crusts() {
             <div>
                 <PizzaNav />
             </div>
-            <div className="container mt-4">
+            <div className="container my-4">
                 <h1 className="mb-4">Crusts Manager</h1>
 
                 {/* Create/Edit Form */}
-                <div className="card mb-4">
+                <div className="card my-4">
                     <div className="card-header">
                         <h5 className="mb-0">{editingCrust ? "Edit Crust" : "Add New Crust"}</h5>
                     </div>
@@ -151,7 +150,7 @@ function Crusts() {
                 </div>
 
                 {/* Crusts List */}
-                <div className="card">
+                <div className="card my-4">
                     <div className="card-header">
                         <h5 className="mb-0">All Crusts</h5>
                     </div>
