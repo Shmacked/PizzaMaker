@@ -1,4 +1,5 @@
 import { apiFetch } from "./client";
+import React from "react";
 
 export type Sauce = {
     id: number;
@@ -29,5 +30,26 @@ export const updateSauce = async (sauce_id: number, sauce: Sauce) => {
 };
 
 export const deleteSauce = async (sauce_id: number) => {
-    return await apiFetch<Sauce>(`/pizza/delete_sauce/${sauce_id}`);
+    return await apiFetch<Sauce>(`/pizza/delete_sauce/${sauce_id}`, {
+        method: "DELETE",
+    });
+};
+
+interface DisplaySaucesProps {
+    sauces: Sauce[];
+}
+
+export const DisplaySauces: React.FC<DisplaySaucesProps> = ({ sauces }) => {
+    return (
+        <>
+            <h1>Sauces</h1>
+            <ul className="list-group list-group-flush">
+                {sauces.map(s => (
+                    <li className="list-group-item" key={s.id}>
+                        {s.name} — ${s.price}
+                    </li>
+                ))}
+            </ul>
+        </>
+    );
 };

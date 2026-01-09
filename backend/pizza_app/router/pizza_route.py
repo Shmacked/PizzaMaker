@@ -1,7 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import func, select
 from typing import List
 import logging
+import os
+import shutil
+from pathlib import Path
 from pizza_app.database import get_db
 
 # Set up logger
@@ -12,7 +17,8 @@ from pizza_app.models.pizza_models import (
     Sauce as SauceModel, 
     Crust as CrustModel, 
     Topping as ToppingModel, 
-    ToppingCategory as ToppingCategoryModel
+    ToppingCategory as ToppingCategoryModel,
+    topping_categories
 )
 from pizza_app.models.pizza_schemas import (
     Pizza, Size, Sauce, Crust, Topping, ToppingCategory,
@@ -85,8 +91,30 @@ async def get_pizza_crust(crust_id: int, db: Session = Depends(get_db)):
 
 @router.get("/get_pizza_toppings", response_model=List[Topping])
 async def get_pizza_toppings(db: Session = Depends(get_db)):
-    """Get all pizza toppings"""
-    toppings = db.query(ToppingModel).all()
+    """Get all pizza toppings, ordered by their first category name (alphabetically)"""
+    
+    # Subquery to get the minimum (first alphabetically) category name for each topping
+    # This allows us to group/order toppings by their primary category
+    min_category_name = (
+        select(func.min(ToppingCategoryModel.name))
+        .select_from(ToppingCategoryModel)
+        .join(
+            topping_categories,
+            ToppingCategoryModel.id == topping_categories.c.category_id
+        )
+        .where(topping_categories.c.topping_id == ToppingModel.id)
+        .correlate(ToppingModel)
+        .scalar_subquery()
+    )
+    
+    # Query toppings ordered by their first category name, then by topping name
+    # nulls_last() ensures toppings without categories appear at the end
+    toppings = (
+        db.query(ToppingModel)
+        .order_by(min_category_name.nulls_last(), ToppingModel.name)
+        .all()
+    )
+    
     return toppings
 
 @router.get("/get_pizza_topping/{topping_id}", response_model=Topping)
@@ -182,8 +210,8 @@ async def add_topping(topping: ToppingCreate, db: Session = Depends(get_db)):
     db.refresh(db_topping)
     return db_topping
 
-@router.post("/add_topping_category", response_model=ToppingCategory, status_code=201)
-async def add_topping_category(
+@router.post("/add_pizza_topping_category", response_model=ToppingCategory, status_code=201)
+async def add_pizza_topping_category(
     topping_category: ToppingCategoryCreate, 
     db: Session = Depends(get_db)
 ):
@@ -510,8 +538,8 @@ async def update_crust_full(
     return db_crust
 
 # Topping Category Updates
-@router.patch("/update_topping_category/{category_id}", response_model=ToppingCategory)
-async def update_topping_category(
+@router.patch("/update_pizza_topping_category/{category_id}", response_model=ToppingCategory)
+async def update_pizza_topping_category(
     category_id: int,
     category_update: ToppingCategoryUpdate,
     db: Session = Depends(get_db)
@@ -534,8 +562,8 @@ async def update_topping_category(
     db.refresh(db_category)
     return db_category
 
-@router.put("/update_topping_category/{category_id}", response_model=ToppingCategory)
-async def update_topping_category_full(
+@router.put("/update_pizza_topping_category/{category_id}", response_model=ToppingCategory)
+async def update_pizza_topping_category_full(
     category_id: int,
     category: ToppingCategoryCreate,
     db: Session = Depends(get_db)
@@ -622,15 +650,86 @@ async def update_topping_full(
     return db_topping
 
 ################################################################################
+# FILE UPLOAD/DELETE requests
+################################################################################
+
+# Path to images directory (relative to project root)
+# From backend/pizza_app/router/, go up 3 levels to project root
+IMAGES_DIR = Path(__file__).parent.parent.parent.parent / "frontend" / "dist" / "images"
+IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+
+@router.post("/upload_image")
+async def upload_image(file: UploadFile = File(...)):
+    """Upload an image file to the images directory"""
+    try:
+        # Generate a unique filename to avoid conflicts
+        import uuid
+        file_extension = Path(file.filename).suffix
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+        file_path = IMAGES_DIR / unique_filename
+        
+        # Save the file
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Return the relative path that will be used in the frontend
+        return JSONResponse(content={"filename": f"images/{unique_filename}", "path": f"/images/{unique_filename}"})
+    except Exception as e:
+        logger.error(f"Error uploading file: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
+
+@router.delete("/delete_image/{filename:path}")
+async def delete_image(filename: str):
+    """Delete an image file from the images directory"""
+    try:
+        # Remove 'images/' prefix if present
+        if filename.startswith("images/"):
+            filename = filename[7:]
+        elif filename.startswith("/images/"):
+            filename = filename[8:]
+        
+        file_path = IMAGES_DIR / filename
+        
+        if file_path.exists() and file_path.is_file():
+            file_path.unlink()
+            return JSONResponse(content={"message": "File deleted successfully"})
+        else:
+            raise HTTPException(status_code=404, detail="File not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting file: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete file: {str(e)}")
+
+################################################################################
 # DELETE requests
 ################################################################################
 
 @router.delete("/delete_pizza/{pizza_id}", status_code=204)
 async def delete_pizza(pizza_id: int, db: Session = Depends(get_db)):
-    """Delete a pizza"""
+    """Delete a pizza and its associated image file"""
     pizza = db.query(PizzaModel).filter(PizzaModel.id == pizza_id).first()
     if not pizza:
         raise HTTPException(status_code=404, detail="Pizza not found")
+    
+    # Delete the image file if it exists
+    if pizza.image_url:
+        try:
+            # Extract filename from image_url
+            filename = pizza.image_url
+            if filename.startswith("images/"):
+                filename = filename[7:]
+            elif filename.startswith("/images/"):
+                filename = filename[8:]
+            
+            file_path = IMAGES_DIR / filename
+            if file_path.exists() and file_path.is_file():
+                file_path.unlink()
+                logger.info(f"Deleted image file: {file_path}")
+        except Exception as e:
+            logger.error(f"Error deleting image file for pizza {pizza_id}: {e}")
+            # Continue with pizza deletion even if image deletion fails
+    
     db.delete(pizza)
     db.commit()
     return None
@@ -668,15 +767,17 @@ async def delete_topping(topping_id: int, db: Session = Depends(get_db)):
 @router.delete("/delete_size/{size_id}", status_code=204)
 async def delete_size(size_id: int, db: Session = Depends(get_db)):
     """Delete a size"""
+    logger.info(f"Deleting size: {size_id}")
     size = db.query(SizeModel).filter(SizeModel.id == size_id).first()
     if not size:
+        logger.error(f"Size not found: {size_id}")
         raise HTTPException(status_code=404, detail="Size not found")
     db.delete(size)
     db.commit()
     return None
 
-@router.delete("/delete_topping_category/{category_id}", status_code=204)
-async def delete_topping_category(category_id: int, db: Session = Depends(get_db)):
+@router.delete("/delete_pizza_topping_category/{category_id}", status_code=204)
+async def delete_pizza_topping_category(category_id: int, db: Session = Depends(get_db)):
     """Delete a topping category"""
     category = db.query(ToppingCategoryModel).filter(ToppingCategoryModel.id == category_id).first()
     if not category:

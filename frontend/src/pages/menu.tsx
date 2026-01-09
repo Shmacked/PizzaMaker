@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
-import type { Size } from "../api/sizes";
-import { getSizes } from "../api/sizes";
-import type { Sauce } from "../api/sauces";
-import { getSauces } from "../api/sauces";
-import type { Crust } from "../api/crusts";
-import { getCrusts } from "../api/crusts";
-import type { Topping } from "../api/toppings";
-import { getToppings } from "../api/toppings";
-import type { Pizza } from "../api/pizza";
-import { getPizzas } from "../api/pizza";
+import { getSizes, DisplaySizes, type Size } from "../api/sizes";
+import { getSauces, DisplaySauces, type Sauce } from "../api/sauces";
+import { getCrusts, DisplayCrusts, type Crust } from "../api/crusts";
+import { getToppings, DisplayToppings, type Topping } from "../api/toppings";
+import { getPizzas, DisplayPizzas, type Pizza } from "../api/pizza";
+import PizzaNav from "../page_related/pizza_navbar.tsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 // import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -52,62 +48,28 @@ function App() {
 
   return (
     <div>
-      <h1>Pizzas</h1>
-      <ul>
-        {pizzas.map(p => (
-          <li key={p.id}>
-            {p.name}
-            <ul>
-              <li>
-                {p.description}
-              </li>
-              <li>
-                {p.image_url}
-              </li>
-              <li>
-                {p.is_available ? "Available" : "Not Available"}
-              </li>
-              {p.sizes.map(s => (
-                <li key={s.id}>
-                  {s.size} — ${s.base_price + p.sauce.price + p.crust.price + p.toppings.reduce((sum, topping) => sum + topping.price, 0)}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
-      <h1>Sizes</h1>
-      <ul>
-        {sizes.map(s => (
-          <li key={s.id}>
-            {s.size} — ${s.base_price}
-          </li>
-        ))}
-      </ul>
-      <h1>Sauces</h1>
-      <ul>
-        {sauces.map(s => (
-          <li key={s.id}>
-            {s.name} — ${s.price}
-          </li>
-        ))}
-      </ul>
-      <h1>Crusts</h1>
-      <ul>
-        {crusts.map(c => (
-          <li key={c.id}>
-            {c.name} — ${c.price}
-          </li>
-        ))}
-      </ul>
-      <h1>Toppings</h1>
-      <ul>
-        {toppings.map(t => (
-          <li key={t.id}>
-            {t.name} — ${t.price}
-          </li>
-        ))}
-      </ul>
+      <div>
+        <PizzaNav />
+      </div>
+      <div className="container-fluid">
+        <div className="row d-flex justify-content-center my-4">
+          <DisplayPizzas pizzas={pizzas} />
+        </div>
+        <div className="row d-flex justify-content-center my-4">
+          <div className="col">
+            <DisplaySizes sizes={sizes} />
+          </div>
+          <div className="col">
+            <DisplaySauces sauces={sauces} />
+          </div>
+          <div className="col">
+            <DisplayCrusts crusts={crusts} />
+          </div>
+        </div>
+        <div className="row d-flex justify-content-center my-4">
+          <DisplayToppings toppings={toppings} />
+        </div>
+      </div>
     </div>
   );
 }
