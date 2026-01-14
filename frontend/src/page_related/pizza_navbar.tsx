@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Dropdown } from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./pizza_navbar.css";
 import { useEffect } from "react";
 
 function PizzaNav() {

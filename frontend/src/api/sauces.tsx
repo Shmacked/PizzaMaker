@@ -42,7 +42,7 @@ interface DisplaySaucesProps {
 export const DisplaySauces: React.FC<DisplaySaucesProps> = ({ sauces }) => {
     return (
         <>
-            <h1>Sauces</h1>
+            <h1 style={{ fontFamily: 'Monterey', fontSize: '4rem', textDecoration: 'underline' }}>Sauces</h1>
             <ul className="list-group list-group-flush">
                 {sauces.map(s => (
                     <li className="list-group-item" key={s.id}>

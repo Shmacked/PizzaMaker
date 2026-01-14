@@ -44,7 +44,7 @@ interface DisplayCrustsProps {
 export const DisplayCrusts: React.FC<DisplayCrustsProps> = ({ crusts }) => {
   return (
       <>
-          <h1>Crusts</h1>
+          <h1 style={{ fontFamily: 'Monterey', fontSize: '4rem', textDecoration: 'underline' }}>Crusts</h1>
           <ul className="list-group list-group-flush">
               {crusts.map(c => (
                   <li className="list-group-item" key={c.id}>

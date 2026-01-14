@@ -440,8 +440,8 @@ function Pizzas() {
                                                 </td>
                                                 <td>{pizza.sizes.map(size => size.size).join(", ")}</td>
                                                 <td>{pizza.toppings.map(topping => topping.name).join(", ")}</td>
-                                                <td>{pizza.sauce.name}</td>
-                                                <td>{pizza.crust.name}</td>
+                                                <td className="text-nowrap">{pizza.sauce.name}</td>
+                                                <td className="text-nowrap">{pizza.crust.name}</td>
                                                 <td>
                                                     <div className="d-flex flex-nowrap gap-1">
                                                         <button

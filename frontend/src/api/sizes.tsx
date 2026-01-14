@@ -44,7 +44,7 @@ interface DisplaySizesProps {
 export const DisplaySizes: React.FC<DisplaySizesProps> = ({ sizes }) => {
     return (
         <>
-            <h1>Sizes</h1>
+            <h1 style={{ fontFamily: 'Monterey', fontSize: '4rem', textDecoration: 'underline' }}>Sizes</h1>
             <ul className="list-group list-group-flush">
                 {sizes.map(s => (
                     <li className="list-group-item" key={s.id}>

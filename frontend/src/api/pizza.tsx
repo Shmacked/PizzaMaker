@@ -1,8 +1,16 @@
 import { apiFetch } from "./client";
+import { getImageUrl } from "./images";
+
 import type { Size } from "./sizes";
 import type { Sauce } from "./sauces";
 import type { Crust } from "./crusts";
 import type { Topping } from "./toppings";
+
+import { Modal } from "bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import clsx from "clsx";
+
 import React from "react";
 
 export type Pizza = {
@@ -73,15 +81,36 @@ interface DisplayPizzasProps {
     pizzas: Pizza[];
 }
 
-import { getImageUrl } from "./images";
-
 export const DisplayPizzas: React.FC<DisplayPizzasProps> = ({ pizzas }) => {
+    // State to track which pizza is currently selected
+    const [selectedPizzaId, setSelectedPizzaId] = React.useState<number | null>(null);
+    const [selectedPizza, setSelectedPizza] = React.useState<Pizza | null>(null);
+
+    const handlePizzaHoverEnter = (pizza: Pizza) => {
+        setSelectedPizzaId(pizza.id);
+    };
+
+    const handlePizzaHoverLeave = (pizza: Pizza) => {
+        setSelectedPizzaId(null);
+    };
+
+
+    const handleMouseClick = (pizza: Pizza) => {
+        setSelectedPizza(pizza);
+        const modal = Modal.getOrCreateInstance(document.getElementById("pizzaModal") as HTMLElement);
+        modal.show();
+    };
+
+
     return (
         <>
             <div className="row row-cols-1 row-cols-md-auto g-3 justify-content-center">
                 {pizzas.filter(p => p.is_available).map(p => (
                     <div className="col" key={p.id}>
-                        <div className="card h-100" style={{ width: "18rem" }} key={p.id}>
+                        <div className={clsx("card h-100 border border-2", {
+                            "border-success": selectedPizzaId === p.id,
+                            "border-light": selectedPizzaId !== p.id,
+                        })} style={{ width: "18rem" }} key={p.id} onMouseEnter={() => handlePizzaHoverEnter(p)} onMouseLeave={() => handlePizzaHoverLeave(p)} onClick={() => handleMouseClick(p)}>
                             <img src={getImageUrl(p.image_url)} alt={p.name} className="card-img-top" style={{ height: "200px", objectFit: "cover" }} />
                             <div className="card-body d-flex flex-column">
                                 <h5 className="card-title">{p.name}</h5>
@@ -100,6 +129,33 @@ export const DisplayPizzas: React.FC<DisplayPizzasProps> = ({ pizzas }) => {
                     </div>
                 ))}
             </div>
+
+            <div className="modal modal-lg" id="pizzaModal">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">{selectedPizza?.name}</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body" style={{ backgroundImage: `url(${getImageUrl(selectedPizza?.image_url || "")})`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat", backgroundBlendMode: "overlay" }}>
+                            <div style={{ backgroundColor: "rgba(255, 255, 255, 0.8)", padding: "10px", borderRadius: "10px" }}>
+                                <b>Available Sizes:</b> <br />
+                                <p>{selectedPizza?.sizes.map(s => s.size).join(", ")}</p>
+                                <b>Toppings:</b> <br />
+                                <p>{selectedPizza?.toppings.map(t => t.name).join(", ")}</p>
+                                <b>Sauce:</b> <br />
+                                <p>{selectedPizza?.sauce.name}</p>
+                                <b>Crust:</b> <br />
+                                <p>{selectedPizza?.crust.name}</p>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </>
     );
 };

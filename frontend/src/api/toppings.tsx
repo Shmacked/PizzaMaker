@@ -68,7 +68,7 @@ export const DisplayToppings: React.FC<DisplayToppingsProps> = ({ toppings }) =>
 
     return (
         <>
-            <h1>Toppings</h1>
+            <h1 style={{ fontFamily: 'Monterey', fontSize: '4rem', textDecoration: 'underline' }}>Toppings</h1>
             <div className="row">
                 {columns.map((column, colIndex) => (
                     <div key={colIndex} className="col-md-4">

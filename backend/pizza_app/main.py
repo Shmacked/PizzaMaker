@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from uvicorn import run
 from contextlib import asynccontextmanager
 import logging
-from pizza_app.router import pizza_route
+from pizza_app.router import pizza_route, chat_route
 from pizza_app.models.pizza_models import init_db
 from fastapi.staticfiles import StaticFiles
 
@@ -44,6 +44,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 app.include_router(pizza_route.router)
+app.include_router(chat_route.router)
 # Mount dist directory at /dist so images are accessible at /dist/images/
 # This also serves the React app at /dist/
 # app.mount("/dist", StaticFiles(directory="../frontend/dist", html=True))
